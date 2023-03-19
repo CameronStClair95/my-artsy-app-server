@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const postSchema = new mongoose.Schema({
+const ArtpostSchema = new mongoose.Schema({
   artist: {
     type: String,
     required: true,
@@ -8,6 +8,10 @@ const postSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+  },
+  description: {
+    type: String,
+    required: false,
   },
   medium: {
     type: String,
@@ -21,7 +25,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  image: {
+  art_image: {
     type: String,
     required: true,
   },
@@ -32,6 +36,6 @@ const postSchema = new mongoose.Schema({
   }
   );
 
-const Post = mongoose.model('Post', postSchema);
+const Artpost = mongoose.model('Artpost', ArtpostSchema);
 
-module.exports = Post;
+module.exports = Artpost;
