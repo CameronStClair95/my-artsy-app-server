@@ -22,7 +22,7 @@ cloudinary.config({
     }
   });
 
-  //                     storage: storage
+  // Storage: storage
 module.exports = multer({ storage });
 
 
