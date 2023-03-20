@@ -10,6 +10,8 @@ const jwt = require("jsonwebtoken");
 // Require the User model in order to interact with the database
 const User = require("../models/User.model");
 
+const { isLoggedIn, isLoggedOut } = require("../middleware/route-guard.js");
+
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 /* const { isAuthenticated } = require("../middleware/jwt.middleware.js"); */
 const {isAuthenticated} = require("../middleware/jwt.middleware")
@@ -18,12 +20,13 @@ const {isAuthenticated} = require("../middleware/jwt.middleware")
 const saltRounds = 10;
 
 // POST /auth/signup  - Creates a new user in the database
+// working ✅
 router.post("/signup", (req, res, next) => {
-  const { email, password, name } = req.body;
+  const { email, password, fullname, username } = req.body;
 
   // Check if email or password or name are provided as empty strings
-  if (email === "" || password === "" || name === "") {
-    res.status(400).json({ message: "Provide email, password and name" });
+  if (email === "" || password === "" || fullname === "" || username === "") {
+    res.status(400).json({ message: "Provide email, password, fullname and username" });
     return;
   }
 
@@ -59,15 +62,15 @@ router.post("/signup", (req, res, next) => {
 
       // Create the new user in the database
       // We return a pending promise, which allows us to chain another `then`
-      return User.create({ email, password: hashedPassword, name });
+      return User.create({ email, password: hashedPassword, fullname, username });
     })
     .then((createdUser) => {
       // Deconstruct the newly created user object to omit the password
       // We should never expose passwords publicly
-      const { email, name, _id } = createdUser;
+      const { email, fullname, _id, username } = createdUser;
 
       // Create a new object that doesn't expose the password
-      const user = { email, name, _id };
+      const user = { email, fullname, _id, username };
 
       // Send a json response containing the user object
       res.status(201).json({ user: user });
@@ -75,6 +78,7 @@ router.post("/signup", (req, res, next) => {
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
 });
 
+// working ✅
 // POST  /auth/login - Verifies email and password and returns a JWT
 router.post("/login", (req, res, next) => {
   const { email, password } = req.body;
@@ -127,6 +131,13 @@ router.get("/verify", isAuthenticated, (req, res, next) => {
 
   // Send back the token payload object containing the user data
   res.status(200).json(req.payload);
+});
+
+router.post("/logout", isLoggedIn, (req, res, next) => {
+  req.session.destroy((error) => {
+    if (error) next(error);
+    res.redirect("/login");
+  });
 });
 
 module.exports = router;
