@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  /* author: [{type: Schema.Types.ObjectId, ref: "User"}] */
 }, {
   // this second object adds extra properties: `createdAt` and `updatedAt`
   timestamps: true,

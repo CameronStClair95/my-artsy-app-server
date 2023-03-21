@@ -7,6 +7,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required."],
+      match: [/^\S+@\S+\.\S+$/, "Please use a valid email address."],
       unique: true,
       lowercase: true,
       trim: true,
@@ -21,8 +22,14 @@ const userSchema = new Schema(
     },
     username: {
       type: String,
+      unique: true,
+      trim: true,
       required: [true, "Username is required."],
     },
+    postsByUser: [{type:Schema.Types.ObjectId, ref: "Post"}],
+    artpostsByUser: [{type:Schema.Types.ObjectId, ref: "Artpost"}],
+    commentsByUser: [{type:Schema.Types.ObjectId, ref: "Comment"}],
+    
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

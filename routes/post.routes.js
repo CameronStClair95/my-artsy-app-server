@@ -12,7 +12,7 @@ const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
 // POST route for creating a new post of type "artpost"
 router.post("/artpost", (req, res, next) => {
-    const { artist, title, description, medium, year, dimensions, art_image } = req.body;
+    const { artist, title, description, medium, year, dimensions, art_image, author } = req.body;
     // Check if all required fields are provided
     if (!artist || !title || !description || !medium || !year || !dimensions || !art_image) {
         console.log("Error: Missing required fields");
@@ -33,7 +33,7 @@ router.post("/artpost", (req, res, next) => {
 
 // POST route for creating a new post of type "post"
 router.post("/post", (req, res, next) => {
-    const { content, post_image, place } = req.body;
+    const { content, post_image, place, author } = req.body;
     // Check if all required fields are provided
     if (!content || !post_image || !place) {
         console.log("Error: Missing required fields");

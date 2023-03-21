@@ -14,7 +14,9 @@ const likeSchema = new mongoose.Schema(
     isPost: {
       type: Boolean,
       required: true
-    }
+    },
+    // check twice this line above! 💔
+    isLiked: [{type: Schema.Types.ObjectId, ref: "User"}]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

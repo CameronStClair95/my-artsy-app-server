@@ -10,6 +10,21 @@ const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
 
+
+router.get("/home", (req, res, next) => {
+
+    Post.find()
+    .then(allPosts => res.json(allPosts))
+    .catch(error => res.json(error))
+
+    /* Artpost.find()
+    .then(allArtPosts => res.json(allArtPosts))
+    .catch(error => res.json(error)) */
+
+
+    /* promise all method */
+})
+
 // page for the user to see it's details and posts
 router.get("/:userId", (req, res, next) => {
 
@@ -24,17 +39,6 @@ router.get("/:userId", (req, res, next) => {
 
 router.get("/userId/favorites", (req, res, next) => {
     
-})
-
-router.get("/home", (req, res, next) => {
-
-    Artpost.find()
-    .then(allArtPosts => res.json(allArtPosts))
-    .catch(error => res.json(error))
-
-    Post.find()
-    .then(allPosts => res.json(allPosts))
-    .catch(error => res.json(error))
 })
 
 router.post("/home/userId/:postId/delete", (req, res, next) => {
