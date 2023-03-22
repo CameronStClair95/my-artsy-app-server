@@ -20,7 +20,7 @@ router.post("/artpost", (req, res, next) => {
         return;
     }
     // Create new Artpost object and save to database
-    Artpost.create({ artist, title, description, medium, year, dimensions, art_image })
+    Artpost.create({ artist, title, description, medium, year, dimensions, art_image, author:req.session.currentUser._id })
         .then(response => {
             console.log("Success: Artpost created");
             res.json(response);
@@ -41,7 +41,7 @@ router.post("/post", (req, res, next) => {
         return;
     }
     // Create new Post object and save to database
-    Post.create({ content, post_image, place })
+    Post.create({ content, post_image, place, author:req.session.currentUser._id })
         .then(response => {
             console.log("Success: Post created");
             res.json(response);

@@ -13,8 +13,17 @@ const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
 router.get("/home", (req, res, next) => {
 
+    const getPost = Post.find()
+    const getArtpost = Artpost.find()
+
+    Promise.all([getPost, getArtpost]) 
+        .then(allPostsTogether => res.json(allPostsTogether))
+        .then(allPostsTogether => console.log(allPostsTogether))
+        .catch(error => res.json(error))
+
     Post.find()
     .then(allPosts => res.json(allPosts))
+    .then(console.log())
     .catch(error => res.json(error))
 
     /* Artpost.find()

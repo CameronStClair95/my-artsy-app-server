@@ -29,6 +29,7 @@ const userSchema = new Schema(
     postsByUser: [{type:Schema.Types.ObjectId, ref: "Post"}],
     artpostsByUser: [{type:Schema.Types.ObjectId, ref: "Artpost"}],
     commentsByUser: [{type:Schema.Types.ObjectId, ref: "Comment"}],
+    liked: [{type:Schema.Types.ObjectId, ref: "Like"}]
     
   },
   {
