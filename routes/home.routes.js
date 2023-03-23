@@ -12,13 +12,29 @@ const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
 
 router.get("/home", (req, res, next) => {
+    
+    let posts;
+    let artPosts;
+    Post.find()
+    .then(allPosts=>{
+        posts=allPosts
+        return Artpost.find()
+    })
+    .then(allArtPosts=>{
+        artPosts = allArtPosts
+    })
+    .then(()=>{
+        res.json({posts,artPosts})
+    })
 
-    const getPost = Post.find()
+/*     const getPost = Post.find()
     const getArtpost = Artpost.find()
 
     Promise.all([getArtpost, getPost ]) 
         .then(allPostsTogether => res.json(allPostsTogether))
         .catch(error => res.json(error))
+
+     */
 })
 
 // page for the user to see it's details and posts
