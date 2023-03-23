@@ -3,10 +3,10 @@ const router = require("express").Router()
 const User = require("../models/User.model")
 const Artpost = require("../models/Artpost.model")
 const Post = require("../models/Post.model")
+
 const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose")
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
-
 
 const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
@@ -16,18 +16,18 @@ router.post("/artpost", (req, res, next) => {
     // Check if all required fields are provided
     if (!artist || !title || !description || !medium || !year || !dimensions || !art_image) {
         console.log("Error: Missing required fields");
-        res.status(400).json({ message: "Please provide all required fields" });
+        res.sendStatus(400).json({ message: "Please provide all required fields" });
         return;
     }
     // Create new Artpost object and save to database
-    Artpost.create({ artist, title, description, medium, year, dimensions, art_image, author:req.session.currentUser._id })
+    Artpost.create({ artist, title, description, medium, year, dimensions, art_image, /* author:req.session.currentUser._id  */})
         .then(response => {
             console.log("Success: Artpost created");
             res.json(response);
         })
         .catch(error => {
             console.log(`Error creating Artpost: ${error}`);
-            res.status(500).json({ message: "Error creating Artpost" });
+            res.sendStatus(500).json({ message: "Error creating Artpost" });
         })
 });
 
@@ -40,9 +40,6 @@ router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
       return;
     }
     
-    // Get the URL of the uploaded file and send it as a response.
-    // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
-    
     res.json({ fileUrl: req.file.path });
   });
 
@@ -52,7 +49,7 @@ router.post("/post", (req, res, next) => {
     // Check if all required fields are provided
     if (!content || !post_image || !place) {
         console.log("Error: Missing required fields");
-        res.status(400).json({ message: "Please provide all required fields" });
+        res.sendStatus(400).json({ message: "Please provide all required fields" });
         return;
     }
     // Create new Post object and save to database
@@ -63,7 +60,7 @@ router.post("/post", (req, res, next) => {
         })
         .catch(error => {
             console.log(`Error creating Post: ${error}`);
-            res.status(500).json({ message: "Error creating Post" });
+            res.sendStatus(500).json({ message: "Error creating Post" });
         })
 });
 

@@ -16,22 +16,9 @@ router.get("/home", (req, res, next) => {
     const getPost = Post.find()
     const getArtpost = Artpost.find()
 
-    Promise.all([getPost, getArtpost]) 
+    Promise.all([getArtpost, getPost ]) 
         .then(allPostsTogether => res.json(allPostsTogether))
-        .then(allPostsTogether => console.log(allPostsTogether))
         .catch(error => res.json(error))
-
-    Post.find()
-    .then(allPosts => res.json(allPosts))
-    .then(console.log())
-    .catch(error => res.json(error))
-
-    /* Artpost.find()
-    .then(allArtPosts => res.json(allArtPosts))
-    .catch(error => res.json(error)) */
-
-
-    /* promise all method */
 })
 
 // page for the user to see it's details and posts
