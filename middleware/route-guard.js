@@ -14,4 +14,14 @@ const isLoggedOut = (req, res, next) => {
     next()
 }
 
-module.exports = {isLoggedIn, isLoggedOut}
+const isAdmin = (req, res, next) => {
+    if (req.session.currentUser && req.session.currentUser.role === "admin") {
+      next();
+    } else {
+      res.status(403).json({ message: "Unauthorized" });
+    }
+  };
+
+
+
+module.exports = {isLoggedIn, isLoggedOut, isAdmin}

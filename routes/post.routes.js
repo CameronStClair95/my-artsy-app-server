@@ -8,7 +8,7 @@ const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose")
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
-const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
+const {isLoggedIn, isLoggedOut, isAdmin} = require("../middleware/route-guard")
 
 // POST route for creating a new post of type "artpost"
 router.post("/artpost", (req, res, next) => {
@@ -63,5 +63,20 @@ router.post("/post", (req, res, next) => {
             res.sendStatus(500).json({ message: "Error creating Post" });
         })
 });
+
+// Route to create a new art news post
+// router.post("/news-art-posts", isLoggedIn, isAdmin, (req, res, next) => {
+    // Your code to create a new art news post
+//   });
+  
+  // Route to edit an art news post
+//   router.put("/news-art-posts/:postId/edit", isLoggedIn, isAdmin, (req, res, next) => {
+    // Your code to edit an existing art news post
+//   });
+  
+  // Route to delete an art news post
+//   router.delete("/news-art-posts/:postId/delete", isLoggedIn, isAdmin, (req, res, next) => {
+    // Your code to delete an existing art news post
+//   });
 
 module.exports = router
