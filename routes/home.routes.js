@@ -1,20 +1,21 @@
 const router = require("express").Router()
+const mongoose = require("mongoose")
+const axios = require("axios")
 
 const User = require("../models/User.model")
 const Artpost = require("../models/Artpost.model")
 const Post = require("../models/Post.model")
-
-const mongoose = require("mongoose")
+const News = require("../models/News.model")
 
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 const {isLoggedIn, isLoggedOut} = require("../middleware/route-guard")
 
-
-
+// working ✅
 router.get("/home", (req, res, next) => {
     
     let posts;
     let artPosts;
+    let newsPosts
     Post.find()
     .then(allPosts=>{
         posts=allPosts
@@ -22,34 +23,27 @@ router.get("/home", (req, res, next) => {
     })
     .then(allArtPosts=>{
         artPosts = allArtPosts
+        return News.find()
+    })
+    .then(allNewsPosts => {
+        newsPosts = allNewsPosts
     })
     .then(()=>{
-        res.json({posts,artPosts})
+        res.json({posts,artPosts, newsPosts})
     })
-
-/*     const getPost = Post.find()
-    const getArtpost = Artpost.find()
-
-    Promise.all([getArtpost, getPost ]) 
-        .then(allPostsTogether => res.json(allPostsTogether))
-        .catch(error => res.json(error))
-
-     */
 })
 
+// working ✅
 // page for the user to see it's details and posts
-router.get("/:userId", (req, res, next) => {
+router.get("/user", (req, res, next) => {
+    const {userId} = req.params
 
-    /* const {userId} = req.params
-
-    User.findById(req.session.currentUser._id)
+    User.findById(userId)
     .populate("post")
-    .then((posts) => {
-        res.json()
-    }) */
+    .then((posts) => res.json(posts))
 })
 
-router.get("/userId/favorites", (req, res, next) => {
+router.get("/:userId/favorites", (req, res, next) => {
     
 })
 

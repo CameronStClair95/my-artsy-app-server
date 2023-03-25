@@ -1,24 +1,24 @@
 const mongoose = require('mongoose');
 
-const NewsArtpostSchema = new mongoose.Schema(
+const NewsSchema = new mongoose.Schema(
   {
-    News_title: {
+    title: {
       type: String,
       required: true,
     },
-    News_description: {
+    description: {
       type: String,
       required: true,
     },
-    News_art_image: {
+    News_image: {
       type: String,
       required: true,
     },
-    News_source: {
+    source: {
       type: String,
       required: true
     },
-    News_date: {
+    date: {
       type: String,
       required: true
     }
@@ -28,6 +28,6 @@ const NewsArtpostSchema = new mongoose.Schema(
   }
 );
 
-const NewsArtpost = mongoose.model("NewsArtpost", NewsArtpostSchema);
+const News = mongoose.model("News", NewsSchema);
 
-module.exports = NewsArtpost;
+module.exports = News;
