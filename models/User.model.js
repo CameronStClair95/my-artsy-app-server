@@ -31,11 +31,11 @@ const userSchema = new Schema(
     commentsByUser: [{type:Schema.Types.ObjectId, ref: "Comment"}],
     liked: [{type:Schema.Types.ObjectId, ref: "Like"}],
 
-    // role: {
-    //   type: String,
-    //   enum: ["user", "admin"],
-    //   default: "user",
-    // }
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    }
 
   },
   {
