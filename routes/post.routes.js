@@ -43,7 +43,7 @@ router.post("/artpost", (req, res, next) => {
 
 
 // POST route for creating a new post of type "post"
-router.post("/post", (req, res, next) => {
+router.post("/", (req, res, next) => {
     const { content, post_image, place, author } = req.body;
     // Check if all required fields are provided
     if (!content || !post_image || !place) {
@@ -64,7 +64,7 @@ router.post("/post", (req, res, next) => {
 });
 
 //   update post
-router.put('/api/new-post/posts/:id', (req, res, next) => {
+router.put('/:id/update', (req, res, next) => {
   const { id } = req.params;
   const { content, post_image, place } = req.body;
 
@@ -79,7 +79,7 @@ router.put('/api/new-post/posts/:id', (req, res, next) => {
 }); 
 
 // delte post 
-router.delete("/post/:id", (req, res, next) => {
+router.delete("/:id", (req, res, next) => {
   const { id } = req.params;
 
   Post.findByIdAndRemove(id)
@@ -101,7 +101,7 @@ router.delete("/post/:id", (req, res, next) => {
 
 
 // GET route for retrieving a single post by ID
-router.get('/posts/:id', (req, res, next) => {
+router.get('/:id', (req, res, next) => {
     const postId = req.params.id;
     Post.findById(postId)
       .populate('author')
