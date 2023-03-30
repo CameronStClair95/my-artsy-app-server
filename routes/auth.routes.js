@@ -38,11 +38,11 @@ router.post("/signup", (req, res, next) => {
   }
 
   // This regular expression checks password for special characters and minimum length
-  const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
   if (!passwordRegex.test(password)) {
     res.status(400).json({
       message:
-        "Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter.",
+        "Password must have at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*) and be at least 8 characters long.",
     });
     return;
   }

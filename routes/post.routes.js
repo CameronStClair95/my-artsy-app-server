@@ -63,6 +63,68 @@ router.post("/post", (req, res, next) => {
         })
 });
 
+//   update post
+router.put('/api/new-post/posts/:id', (req, res, next) => {
+  const { id } = req.params;
+  const { content, post_image, place } = req.body;
+
+  Post.findByIdAndUpdate(id, { content, post_image, place })
+    .then(updatedPost => {
+      res.json(updatedPost);
+    })
+    .catch(error => {
+      console.log(`Error updating Post: ${error}`);
+      res.sendStatus(500).json({ message: "Error updating Post" });
+    });
+}); 
+
+// delte post 
+router.delete("/post/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  Post.findByIdAndRemove(id)
+    .then((removedPost) => {
+      if (removedPost) {
+        res.status(204).json({ message: `Post with id ${id} was deleted successfully.` });
+      } else {
+        res.status(404).json({ message: `Post with id ${id} was not found.` });
+      }
+    })
+    .catch((error) => {
+      console.log(`Error deleting Post: ${error}`);
+      res.status(500).json({ message: "Error deleting Post." });
+    });
+});
+
+
+
+
+
+// GET route for retrieving a single post by ID
+router.get('/posts/:id', (req, res, next) => {
+    const postId = req.params.id;
+    Post.findById(postId)
+      .populate('author')
+      .then(post => {
+        if (!post) {
+          res.status(404).json({ message: `Post with ID ${postId} not found` });
+        } else {
+          res.json({ post: post });
+        }
+      })
+      .catch(error => {
+        console.log(`Error retrieving post with ID ${postId}: ${error}`);
+        res.status(500).json({ message: 'Error retrieving post' });
+      });
+  });
+
+
+// protect routes for the update and delete posts for the users
+// footer mock up
+//  fix image sizinfg of news art posts
+// check ironhack to make sure we are on track for functionality.
+
+  
 // Route to create a new art news post
 // router.post("/news-art-posts", isLoggedIn, isAdmin, (req, res, next) => {
     // Your code to create a new art news post
