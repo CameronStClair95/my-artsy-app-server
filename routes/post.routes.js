@@ -47,10 +47,11 @@ router.post("/", (req, res, next) => {
     const { content, post_image, place, author } = req.body;
     // Check if all required fields are provided
     if (!content || !post_image || !place) {
-        console.log("Error: Missing required fields");
-        res.sendStatus(400).json({ message: "Please provide all required fields" });
-        return;
-    }
+      console.log("Error: Missing required fields");
+      res.status(400).json({ message: "Please provide all required fields" });
+      return;
+  }
+    
     // Create new Post object and save to database
     Post.create({ content, post_image, place, author })
         .then(response => {
@@ -64,17 +65,24 @@ router.post("/", (req, res, next) => {
 });
 
 //   update post
-router.put('/:id/update', (req, res, next) => {
+router.put('/:id/update', fileUploader.single("post_image"), (req, res, next) => {
   const { id } = req.params;
-  const { content, post_image, place } = req.body;
+  const { content, place } = req.body;
+  const post_image = req.file ? req.file.path : undefined;
 
-  Post.findByIdAndUpdate(id, { content, post_image, place })
+  const updateData = { content, place };
+
+  if (post_image) {
+    updateData.post_image = post_image;
+  }
+
+  Post.findByIdAndUpdate(id, updateData, { new: true })
     .then(updatedPost => {
       res.json(updatedPost);
     })
     .catch(error => {
       console.log(`Error updating Post: ${error}`);
-      res.sendStatus(500).json({ message: "Error updating Post" });
+      res.status(500).json({ message: "Error updating Post" });
     });
 }); 
 
