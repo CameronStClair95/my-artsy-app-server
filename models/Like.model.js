@@ -2,26 +2,22 @@ const mongoose = require('mongoose');
 
 const likeSchema = new mongoose.Schema(
   {
-    author: {
-      type: Schema.Types.ObjectId,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
-    postOrComment: {
-      type: Schema.Types.ObjectId,
+    elementType: {
+      type: mongoose.Schema.Types.ObjectId,
+      enum: ["Post", "Artpost"],
       required: true
     },
-    isPost: {
-      type: Boolean,
+    elementId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true
     },
-    // check twice this line below! 💔
-    isLiked: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
+
   },
-  {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
-    timestamps: true,
-  }
 );
 
 const Like = mongoose.model('Like', likeSchema);

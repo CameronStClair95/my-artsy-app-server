@@ -3,12 +3,13 @@ const router = require("express").Router()
 const User = require("../models/User.model")
 const Artpost = require("../models/Artpost.model")
 const Post = require("../models/Post.model")
+const Like =  require("../models/Like.model")
 
 const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose")
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
-const {isLoggedIn, isLoggedOut, isAdmin} = require("../middleware/route-guard")
+const {isLoggedIn, isLoggedOut, isAdmin} = require("../middleware/route-guard");
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
@@ -36,13 +37,36 @@ router.post("/artpost", (req, res, next) => {
             res.json(response);
             return User.findByIdAndUpdate(author, {$push:{artpostsByUser: response._id}})
         })
-        .then()
+        
         .catch(error => {
             console.log(`Error creating Artpost: ${error}`);
             res.sendStatus(500).json({ message: "Error creating Artpost" });
         })
 
 });
+
+router.post("/like/:id/:postType", (req, res, next) => {
+  const { id, postType } = req.params
+  const {_id} = req.body
+
+  let updateLike
+  if (postType === 'art') {
+    updateLike = Artpost
+  } else {
+    updateLike = Post
+  }
+
+  updateLike.findById(id)
+    .then(postToUpdate => {
+      if (postToUpdate.likedBy.includes(_id)) {
+        return updateLike.findByIdAndUpdate(id, {$pull: { likedBy: _id }}, { new: true })
+      } else {
+        return updateLike.findByIdAndUpdate(id, {$push: { likedBy: _id }}, { new: true })
+      }
+    })
+    .then(response => res.json(response))
+    .catch(error => console.log(error))
+})
 
 router.get("/artposts/:Id", (req, res, next) => {
   Artpost.findById(req.params.Id)

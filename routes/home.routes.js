@@ -55,8 +55,6 @@ router.put("/user/:userId", (req, res, next) => {
     User.findByIdAndUpdate(userId, {fullname, username}, {new:true})
     .select("-password")
     .then((updatedUser) => {
-        /* res.json() */
-
             // Deconstruct the user object to omit the password
             const { _id, email, fullname, username } = updatedUser;
     
