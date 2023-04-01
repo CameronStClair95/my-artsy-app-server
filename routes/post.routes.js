@@ -41,6 +41,16 @@ router.post("/artpost", (req, res, next) => {
         })
 });
 
+router.get("/artposts/:Id", (req, res, next) => {
+  Artpost.findById(req.params.Id)
+.then(response => {
+  res.json(response)
+})
+.catch(error => {
+  console.log(`Error creating Artpost: ${error}`);
+  res.sendStatus(500).json({ message: "Error Getting Artpost" });
+})
+})
 
 // POST route for creating a new post of type "post"
 router.post("/", (req, res, next) => {
