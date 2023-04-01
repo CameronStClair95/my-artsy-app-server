@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose")
 
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
 
@@ -26,8 +27,8 @@ const userSchema = new Schema(
       trim: true,
       required: [true, "Username is required."],
     },
-    postsByUser: [{type:Schema.Types.ObjectId, ref: "Post"}],
-    artpostsByUser: [{type:Schema.Types.ObjectId, ref: "Artpost"}],
+    postsByUser: [{type: Schema.Types.ObjectId, ref: "Post"}],
+    artpostsByUser: [{type: Schema.Types.ObjectId, ref: "Artpost"}],
     commentsByUser: [{type:Schema.Types.ObjectId, ref: "Comment"}],
     liked: [{type:Schema.Types.ObjectId, ref: "Like"}],
 
