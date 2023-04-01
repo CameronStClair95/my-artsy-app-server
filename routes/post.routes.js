@@ -34,11 +34,14 @@ router.post("/artpost", (req, res, next) => {
         .then(response => {
             console.log("Success: Artpost created");
             res.json(response);
+            return User.findByIdAndUpdate(author, {$push:{artpostsByUser: response._id}})
         })
+        .then()
         .catch(error => {
             console.log(`Error creating Artpost: ${error}`);
             res.sendStatus(500).json({ message: "Error creating Artpost" });
         })
+
 });
 
 router.get("/artposts/:Id", (req, res, next) => {
@@ -48,7 +51,7 @@ router.get("/artposts/:Id", (req, res, next) => {
 })
 .catch(error => {
   console.log(`Error creating Artpost: ${error}`);
-  res.sendStatus(500).json({ message: "Error Getting Artpost" });
+  res.status(500).json({ message: "Error Getting Artpost" });
 })
 })
 
@@ -56,21 +59,22 @@ router.get("/artposts/:Id", (req, res, next) => {
 router.post("/", (req, res, next) => {
     const { content, post_image, place, author } = req.body;
     // Check if all required fields are provided
-    if (!content || !post_image || !place) {
-      console.log("Error: Missing required fields");
-      res.status(400).json({ message: "Please provide all required fields" });
-      return;
-  }
-    
+    if (!content || !place) {
+        console.log("Error: Missing required fields");
+        res.sendStatus(400).json({ message: "Please provide all required fields" });
+        return;
+    }
     // Create new Post object and save to database
     Post.create({ content, post_image, place, author })
         .then(response => {
             console.log("Success: Post created");
             res.json(response);
+            return User.findByIdAndUpdate(author, {$push:{postsByUser: response._id}})
         })
+        .then()
         .catch(error => {
             console.log(`Error creating Post: ${error}`);
-            res.sendStatus(500).json({ message: "Error creating Post" });
+            /* res.sendStatus(500).json({ message: "Error creating Post" }); */
         })
 });
 

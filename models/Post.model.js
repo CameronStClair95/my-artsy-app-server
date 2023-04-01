@@ -7,12 +7,13 @@ const postSchema = new mongoose.Schema({
   },
   post_image: {
     type: String,
-    required: true,
+    /* required: true, */
   },
   place: {
     type: String,
     required: true,
   },
+  likedBy: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
   author: {type: mongoose.Schema.Types.ObjectId, ref: "User"}
 }, {
   // this second object adds extra properties: `createdAt` and `updatedAt`
