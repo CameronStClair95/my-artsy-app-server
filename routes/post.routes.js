@@ -68,16 +68,18 @@ router.post("/like/:id/:postType", (req, res, next) => {
     .catch(error => console.log(error))
 })
 
-router.get("/artposts/:Id", (req, res, next) => {
-  Artpost.findById(req.params.Id)
-.then(response => {
-  res.json(response)
-})
-.catch(error => {
-  console.log(`Error creating Artpost: ${error}`);
-  res.status(500).json({ message: "Error Getting Artpost" });
-})
-})
+router.get("/artposts/:id", (req, res, next) => {
+  console.log("Requested Artpost ID:", req.params.id);
+  Artpost.findById(req.params.id)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      console.log(`Error getting Artpost: ${error}`);
+      res.status(500).json({ message: "Error Getting Artpost" });
+    });
+});
+
 
 // POST route for creating a new post of type "post"
 router.post("/", (req, res, next) => {
