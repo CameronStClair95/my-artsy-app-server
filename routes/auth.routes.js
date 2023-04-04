@@ -47,6 +47,11 @@ router.post("/signup", (req, res, next) => {
     return;
   }
 
+  /* if(username.includes(" ")){
+    let usernameWithUnderscore = username.replaceAll(" ", "_")
+     return usernameWithUnderscore
+  } */
+
   // Check the users collection if a user with the same email already exists
   User.findOne({ email })
     .then((foundUser) => {
