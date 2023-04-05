@@ -47,10 +47,11 @@ router.post("/signup", (req, res, next) => {
     return;
   }
 
-  /* if(username.includes(" ")){
-    let usernameWithUnderscore = username.replaceAll(" ", "_")
-     return usernameWithUnderscore
-  } */
+  let usernameWithUnderscore 
+  if(username.includes(" ")){
+    usernameWithUnderscore = username.replaceAll(" ", "_")
+    console.log("new username ", usernameWithUnderscore)
+  }
 
   // Check the users collection if a user with the same email already exists
   User.findOne({ email })
@@ -67,7 +68,7 @@ router.post("/signup", (req, res, next) => {
 
       // Create the new user in the database
       // We return a pending promise, which allows us to chain another `then`
-      return User.create({ email, password: hashedPassword, fullname, username });
+      return User.create({ email, password: hashedPassword, fullname, username: usernameWithUnderscore });
     })
     .then((createdUser) => {
       // Deconstruct the newly created user object to omit the password
