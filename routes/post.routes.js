@@ -32,15 +32,7 @@ router.post("/artpost", (req, res, next) => {
     return;
   }
   // Create new Artpost object and save to database
-  Artpost.create({
-    artist,
-    title,
-    description,
-    medium,
-    year,
-    art_image,
-    author,
-  })
+  Artpost.create({artist, title, description, medium, year, art_image, author})
     .then((response) => {
       console.log("Success: Artpost created");
       res.json(response);
@@ -59,29 +51,9 @@ router.post("/artpost", (req, res, next) => {
 // update artpost route
 router.put("/artposts/:id", (req, res) => {
   const artpostId = req.params.id;
-  const {
-    artist,
-    title,
-    description,
-    medium,
-    year,
-    dimensions,
-    art_image,
-  } = req.body;
+  const {artist, title, description, medium, year, dimensions, art_image} = req.body;
 
-  Artpost.findByIdAndUpdate(
-    artpostId,
-    {
-      artist,
-      title,
-      description,
-      medium,
-      year,
-      dimensions,
-      art_image,
-    },
-    { new: true }
-  )
+  Artpost.findByIdAndUpdate(artpostId,{artist, title, description, medium, year, dimensions, art_image},{ new: true })
     .then((updatedArtpost) => {
       res.status(200).json(updatedArtpost);
     })
@@ -102,7 +74,6 @@ router.put("/artposts/:id", (req, res) => {
           res.status(500).json({ message: "Error Deleting Artpost" });
         });
     });
-
 
 router.post("/like/:id/:postType", (req, res, next) => {
   const { id, postType } = req.params; // post ID
@@ -141,9 +112,6 @@ router.get("/artposts/:id", (req, res, next) => {
       res.status(500).json({ message: "Error Getting Artpost" });
     });
 });
-
-
-
 
 // POST route for creating a new post of type "post"
 router.post("/", (req, res, next) => {
@@ -208,10 +176,6 @@ router.delete("/:id", (req, res, next) => {
     });
 });
 
-
-
-
-
 // GET route for retrieving a single post by ID
 router.get('/:id', (req, res, next) => {
   const postId = req.params.id;
@@ -229,27 +193,5 @@ router.get('/:id', (req, res, next) => {
         res.status(500).json({ message: 'Error retrieving post' });
     });
 });
-
-
-// protect routes for the update and delete posts for the users
-// footer mock up
-//  fix image sizinfg of news art posts
-// check ironhack to make sure we are on track for functionality.
-
-  
-// Route to create a new art news post
-// router.post("/news-art-posts", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to create a new art news post
-//   });
-
-// Route to edit an art news post
-//   router.put("/news-art-posts/:postId/edit", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to edit an existing art news post
-//   });
-
-// Route to delete an art news post
-//   router.delete("/news-art-posts/:postId/delete", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to delete an existing art news post
-//   });
 
 module.exports = router

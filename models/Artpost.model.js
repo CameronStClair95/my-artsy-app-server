@@ -21,10 +21,7 @@ const ArtpostSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
-  dimensions: {
-    type: String,
-    required: false,
-  },
+  
   art_image: {
     type: String,
     required: true,
