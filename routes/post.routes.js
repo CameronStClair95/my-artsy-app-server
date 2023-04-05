@@ -3,7 +3,6 @@ const router = require("express").Router()
 const User = require("../models/User.model")
 const Artpost = require("../models/Artpost.model")
 const Post = require("../models/Post.model")
-const Like =  require("../models/Like.model")
 
 const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose")
@@ -13,61 +12,48 @@ const {isLoggedIn, isLoggedOut, isAdmin} = require("../middleware/route-guard");
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
-    if (!req.file) {
-      next(new Error("No file uploaded!"));
-      return;
-    }
-    
-    res.json({ fileUrl: req.file.path });
-  });
+  if (!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+
+  res.json({ fileUrl: req.file.path });
+});
 
 // POST route for creating a new post of type "artpost"
 router.post("/artpost", (req, res, next) => {
-  const { artist, title, description, medium, year, dimensions, art_image, author } = req.body;
+
+  const { artist, title, description, medium, year, art_image, author } =
+    req.body;
   // Check if all required fields are provided
-  if (!artist || !title || !description || !medium || !year || !dimensions || !art_image) {
-      console.log("Error: Missing required fields");
-      return res.status(400).json({ message: "Please provide all required fields" });
+  if (!artist || !title || !description || !medium || !year || !art_image) {
+    console.log("Error: Missing required fields");
+    res.sendStatus(400).json({ message: "Please provide all required fields" });
+    return;
   }
   // Create new Artpost object and save to database
-  Artpost.create({ artist, title, description, medium, year, dimensions, art_image, author})
-      .then(response => {
-          console.log("Success: Artpost created");
-          res.json(response);
-          return User.findByIdAndUpdate(author, {$push:{artpostsByUser: response._id}})
-      })
-      .catch(error => {
-          console.log(`Error creating Artpost: ${error}`);
-          return res.status(500).json({ message: "Error creating Artpost" });
+  Artpost.create({artist, title, description, medium, year, art_image, author})
+    .then((response) => {
+      console.log("Success: Artpost created");
+      res.json(response);
+      return User.findByIdAndUpdate(author, {
+        $push: { artpostsByUser: response._id },
       });
+    })
+
+    .catch((error) => {
+      console.log(`Error creating Artpost: ${error}`);
+      res.sendStatus(500).json({ message: "Error creating Artpost" });
+    });
+
 });
 
 // update artpost route
 router.put("/artposts/:id", (req, res) => {
   const artpostId = req.params.id;
-  const {
-    artist,
-    title,
-    description,
-    medium,
-    year,
-    dimensions,
-    art_image,
-  } = req.body;
+  const {artist, title, description, medium, year, dimensions, art_image} = req.body;
 
-  Artpost.findByIdAndUpdate(
-    artpostId,
-    {
-      artist,
-      title,
-      description,
-      medium,
-      year,
-      dimensions,
-      art_image,
-    },
-    { new: true }
-  )
+  Artpost.findByIdAndUpdate(artpostId,{artist, title, description, medium, year, dimensions, art_image},{ new: true })
     .then((updatedArtpost) => {
       res.status(200).json(updatedArtpost);
     })
@@ -89,29 +75,31 @@ router.put("/artposts/:id", (req, res) => {
         });
     });
 
-
 router.post("/like/:id/:postType", (req, res, next) => {
-  const { id, postType } = req.params
-  const {_id} = req.body
+  const { id, postType } = req.params; // post ID
+  const { _id } = req.body; // user
 
-  let updateLike
-  if (postType === 'art') {
-    updateLike = Artpost
+  let updateLike;
+  if (postType === "art") {
+    updateLike = Artpost;
   } else {
-    updateLike = Post
+    updateLike = Post;
   }
 
   updateLike.findById(id)
-    .then(postToUpdate => {
+    .then((postToUpdate) => {
       if (postToUpdate.likedBy.includes(_id)) {
-        return updateLike.findByIdAndUpdate(id, {$pull: { likedBy: _id }}, { new: true })
+        //take out of db
+        return User.findByIdAndUpdate(_id,{ $pull: { liked: id } },{ new: true })
+        .then(() =>  updateLike.findByIdAndUpdate(id,{ $pull: { likedBy: _id } },{ new: true }))
       } else {
-        return updateLike.findByIdAndUpdate(id, {$push: { likedBy: _id }}, { new: true })
-      }
-    })
-    .then(response => res.json(response))
-    .catch(error => console.log(error))
-})
+        //put inside of the db
+        return User.findByIdAndUpdate(_id,{ $push: { liked: id } },{ new: true })
+          .then((likeByUser) => { return updateLike.findByIdAndUpdate(id, { $push: { likedBy: _id } }, { new: true })});
+      }})
+    .then((response) => res.json(response))
+    .catch((error) => console.log(error));
+});
 
 router.get("/artposts/:id", (req, res, next) => {
   console.log("Requested Artpost ID:", req.params.id);
@@ -125,55 +113,52 @@ router.get("/artposts/:id", (req, res, next) => {
     });
 });
 
-
-
-
 // POST route for creating a new post of type "post"
 router.post("/", (req, res, next) => {
-    const { content, post_image, place, author } = req.body;
-    // Check if all required fields are provided
-    if (!content || !place) {
-        console.log("Error: Missing required fields");
-        res.sendStatus(400).json({ message: "Please provide all required fields" });
-        return;
-    }
-    // Create new Post object and save to database
-    Post.create({ content, post_image, place, author })
+  const { content, post_image, place, author } = req.body;
+  // Check if all required fields are provided
+  if (!content || !place) {
+    console.log("Error: Missing required fields");
+    res.sendStatus(400).json({ message: "Please provide all required fields" });
+    return;
+  }
+  // Create new Post object and save to database
+  Post.create({ content, post_image, place, author })
         .then(response => {
-            console.log("Success: Post created");
-            res.json(response);
+      console.log("Success: Post created");
+      res.json(response);
             return User.findByIdAndUpdate(author, {$push:{postsByUser: response._id}})
-        })
-        .then()
+    })
+    .then()
         .catch(error => {
-            console.log(`Error creating Post: ${error}`);
-            /* res.sendStatus(500).json({ message: "Error creating Post" }); */
+      console.log(`Error creating Post: ${error}`);
+      /* res.sendStatus(500).json({ message: "Error creating Post" }); */
         })
 });
 
 //   update post
 router.put('/:id/update', fileUploader.single("post_image"), (req, res, next) => {
-  const { id } = req.params;
-  const { content, place } = req.body;
-  const post_image = req.file ? req.file.path : undefined;
+    const { id } = req.params;
+    const { content, place } = req.body;
+    const post_image = req.file ? req.file.path : undefined;
 
-  const updateData = { content, place };
+    const updateData = { content, place };
 
-  if (post_image) {
-    updateData.post_image = post_image;
-  }
+    if (post_image) {
+      updateData.post_image = post_image;
+    }
 
-  Post.findByIdAndUpdate(id, updateData, { new: true })
+    Post.findByIdAndUpdate(id, updateData, { new: true })
     .then(updatedPost => {
-      res.json(updatedPost);
-    })
+        res.json(updatedPost);
+      })
     .catch(error => {
-      console.log(`Error updating Post: ${error}`);
-      res.status(500).json({ message: "Error updating Post" });
-    });
+        console.log(`Error updating Post: ${error}`);
+        res.status(500).json({ message: "Error updating Post" });
+      });
 }); 
 
-// delte post 
+// delte post
 router.delete("/:id", (req, res, next) => {
   const { id } = req.params;
 
@@ -191,48 +176,22 @@ router.delete("/:id", (req, res, next) => {
     });
 });
 
-
-
-
-
 // GET route for retrieving a single post by ID
 router.get('/:id', (req, res, next) => {
-    const postId = req.params.id;
-    Post.findById(postId)
+  const postId = req.params.id;
+  Post.findById(postId)
       .populate('author')
       .then(post => {
-        if (!post) {
-          res.status(404).json({ message: `Post with ID ${postId} not found` });
-        } else {
-          res.json({ post: post });
-        }
-      })
+      if (!post) {
+        res.status(404).json({ message: `Post with ID ${postId} not found` });
+      } else {
+        res.json({ post: post });
+      }
+    })
       .catch(error => {
-        console.log(`Error retrieving post with ID ${postId}: ${error}`);
+      console.log(`Error retrieving post with ID ${postId}: ${error}`);
         res.status(500).json({ message: 'Error retrieving post' });
-      });
-  });
-
-
-// protect routes for the update and delete posts for the users
-// footer mock up
-//  fix image sizinfg of news art posts
-// check ironhack to make sure we are on track for functionality.
-
-  
-// Route to create a new art news post
-// router.post("/news-art-posts", isLoggedIn, isAdmin, (req, res, next) => {
-    // Your code to create a new art news post
-//   });
-  
-  // Route to edit an art news post
-//   router.put("/news-art-posts/:postId/edit", isLoggedIn, isAdmin, (req, res, next) => {
-    // Your code to edit an existing art news post
-//   });
-  
-  // Route to delete an art news post
-//   router.delete("/news-art-posts/:postId/delete", isLoggedIn, isAdmin, (req, res, next) => {
-    // Your code to delete an existing art news post
-//   });
+    });
+});
 
 module.exports = router
