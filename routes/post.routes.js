@@ -23,27 +23,72 @@ router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
 
 // POST route for creating a new post of type "artpost"
 router.post("/artpost", (req, res, next) => {
-    const { artist, title, description, medium, year, dimensions, art_image, author } = req.body;
-    // Check if all required fields are provided
-    if (!artist || !title || !description || !medium || !year || !dimensions || !art_image) {
-        console.log("Error: Missing required fields");
-        res.sendStatus(400).json({ message: "Please provide all required fields" });
-        return;
-    }
-    // Create new Artpost object and save to database
-    Artpost.create({ artist, title, description, medium, year, dimensions, art_image, author})
-        .then(response => {
-            console.log("Success: Artpost created");
-            res.json(response);
-            return User.findByIdAndUpdate(author, {$push:{artpostsByUser: response._id}})
-        })
-        
-        .catch(error => {
-            console.log(`Error creating Artpost: ${error}`);
-            res.sendStatus(500).json({ message: "Error creating Artpost" });
-        })
-
+  const { artist, title, description, medium, year, dimensions, art_image, author } = req.body;
+  // Check if all required fields are provided
+  if (!artist || !title || !description || !medium || !year || !dimensions || !art_image) {
+      console.log("Error: Missing required fields");
+      return res.status(400).json({ message: "Please provide all required fields" });
+  }
+  // Create new Artpost object and save to database
+  Artpost.create({ artist, title, description, medium, year, dimensions, art_image, author})
+      .then(response => {
+          console.log("Success: Artpost created");
+          res.json(response);
+          return User.findByIdAndUpdate(author, {$push:{artpostsByUser: response._id}})
+      })
+      .catch(error => {
+          console.log(`Error creating Artpost: ${error}`);
+          return res.status(500).json({ message: "Error creating Artpost" });
+      });
 });
+
+// update artpost route
+router.put("/artposts/:id", (req, res) => {
+  const artpostId = req.params.id;
+  const {
+    artist,
+    title,
+    description,
+    medium,
+    year,
+    dimensions,
+    art_image,
+  } = req.body;
+
+  Artpost.findByIdAndUpdate(
+    artpostId,
+    {
+      artist,
+      title,
+      description,
+      medium,
+      year,
+      dimensions,
+      art_image,
+    },
+    { new: true }
+  )
+    .then((updatedArtpost) => {
+      res.status(200).json(updatedArtpost);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Failed to update artpost", error });
+    });
+  });
+
+    // delete artpost route
+    router.delete("/artposts/:id", (req, res, next) => {
+      const { id } = req.params;
+      Artpost.findByIdAndRemove(id)
+        .then((response) => {
+          res.json(response);
+        })
+        .catch((error) => {
+          console.log(`Error Deleting Artpost: ${error}`);
+          res.status(500).json({ message: "Error Deleting Artpost" });
+        });
+    });
+
 
 router.post("/like/:id/:postType", (req, res, next) => {
   const { id, postType } = req.params
@@ -79,6 +124,8 @@ router.get("/artposts/:id", (req, res, next) => {
       res.status(500).json({ message: "Error Getting Artpost" });
     });
 });
+
+
 
 
 // POST route for creating a new post of type "post"
