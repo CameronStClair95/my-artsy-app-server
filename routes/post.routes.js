@@ -35,28 +35,47 @@ router.post("/artpost", (req, res, next) => {
     return;
   }
   // Create new Artpost object and save to database
-  Artpost.create({
-    artist,
-    title,
-    description,
-    medium,
-    year,
-    art_image,
-    author,
-  })
+  Artpost.create({artist, title, description, medium, year, art_image, author})
     .then((response) => {
       console.log("Success: Artpost created");
       res.json(response);
-      return User.findByIdAndUpdate(author, {
-        $push: { artpostsByUser: response._id },
-      });
+      return User.findByIdAndUpdate(author, {$push: { artpostsByUser: response._id }});
     })
-
     .catch((error) => {
       console.log(`Error creating Artpost: ${error}`);
       res.sendStatus(500).json({ message: "Error creating Artpost" });
     });
 });
+
+// update artpost route
+router.put("/artposts/:id", (req, res, next) => {
+  const artpostId = req.params.id;
+  const {artist, title, description, medium, year, art_image} = req.body;
+  console.log(req.body)
+
+  Artpost.findByIdAndUpdate(artpostId, {artist, title, description, medium, year, dimensions, art_image},{ new: true })
+    .then((updatedArtpost) => {
+      console.log(updatedArtpost)
+      res.status(200).json(updatedArtpost);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Failed to update artpost", error });
+    });
+  });
+
+    // delete artpost route
+router.delete("/artposts/:id", (req, res, next) => {
+  const { id } = req.params;
+  Artpost.findByIdAndRemove(id)
+    .then((response) => {
+      res.json(response);
+    })
+    .catch((error) => {
+      console.log(`Error Deleting Artpost: ${error}`);
+      res.status(500).json({ message: "Error Deleting Artpost" });
+    });
+});
+
 
 router.post("/like/:id/:postType", (req, res, next) => {
   const { id, postType } = req.params; // post ID
@@ -84,13 +103,14 @@ router.post("/like/:id/:postType", (req, res, next) => {
     .catch((error) => console.log(error));
 });
 
-router.get("/artposts/:Id", (req, res, next) => {
-  Artpost.findById(req.params.Id)
-    .then((response) => {
+router.get("/artposts/:id", (req, res, next) => {
+  console.log("Requested Artpost ID:", req.params.id);
+  Artpost.findById(req.params.id)
+    .then(response => {
       res.json(response);
     })
-    .catch((error) => {
-      console.log(`Error creating Artpost: ${error}`);
+    .catch(error => {
+      console.log(`Error getting Artpost: ${error}`);
       res.status(500).json({ message: "Error Getting Artpost" });
     });
 });
