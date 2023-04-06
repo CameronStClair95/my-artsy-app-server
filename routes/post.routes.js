@@ -43,7 +43,7 @@ router.post("/artpost", (req, res, next) => {
 });
 
 // update artpost route
-router.put("/artposts/:id", (req, res) => {
+router.put("/artposts/:id", (req, res, next) => {
   const artpostId = req.params.id;
   const {
     artist,
@@ -54,6 +54,7 @@ router.put("/artposts/:id", (req, res) => {
     dimensions,
     art_image,
   } = req.body;
+  console.log(req.body)
 
   Artpost.findByIdAndUpdate(
     artpostId,
@@ -69,6 +70,7 @@ router.put("/artposts/:id", (req, res) => {
     { new: true }
   )
     .then((updatedArtpost) => {
+      console.log(updatedArtpost)
       res.status(200).json(updatedArtpost);
     })
     .catch((error) => {
