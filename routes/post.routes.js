@@ -74,11 +74,11 @@ router.post("/like/:id/:postType", (req, res, next) => {
       if (postToUpdate.likedBy.includes(_id)) {
         //take out of db
         return User.findByIdAndUpdate(_id,{ $pull: { liked: id } },{ new: true })
-        .then(() =>  updateLike.findByIdAndUpdate(id,{ $pull: { likedBy: _id } },{ new: true }))
+          .then(() =>  updateLike.findByIdAndUpdate(id,{ $pull: { likedBy: _id } },{ new: true }))
       } else {
         //put inside of the db
         return User.findByIdAndUpdate(_id,{ $push: { liked: id } },{ new: true })
-          .then((likeByUser) => { return updateLike.findByIdAndUpdate(id, { $push: { likedBy: _id } }, { new: true })});
+          .then(() =>  updateLike.findByIdAndUpdate(id, { $push: { likedBy: _id } }, { new: true }));
       }})
     .then((response) => res.json(response))
     .catch((error) => console.log(error));
@@ -121,10 +121,7 @@ router.post("/", (req, res, next) => {
 });
 
 //   update post
-router.put(
-  "/:id/update",
-  fileUploader.single("post_image"),
-  (req, res, next) => {
+router.put("/:id/update", fileUploader.single("post_image"),(req, res, next) => {
     const { id } = req.params;
     const { content, place } = req.body;
     const post_image = req.file ? req.file.path : undefined;
@@ -167,41 +164,18 @@ router.delete("/:id", (req, res, next) => {
 });
 
 // GET route for retrieving a single post by ID
-router.get("/:id", (req, res, next) => {
+router.get("/posts/:id", (req, res, next) => {
   const postId = req.params.id;
   Post.findById(postId)
     .populate("author")
     .then((post) => {
-      if (!post) {
-        res.status(404).json({ message: `Post with ID ${postId} not found` });
-      } else {
-        res.json({ post: post });
-      }
+      if (!post) { res.status(404).json({ message: `Post with ID ${postId} not found` });
+      } else { res.json({ post: post })}
     })
     .catch((error) => {
       console.log(`Error retrieving post with ID ${postId}: ${error}`);
       res.status(500).json({ message: "Error retrieving post" });
     });
 });
-
-// protect routes for the update and delete posts for the users
-// footer mock up
-//  fix image sizinfg of news art posts
-// check ironhack to make sure we are on track for functionality.
-
-// Route to create a new art news post
-// router.post("/news-art-posts", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to create a new art news post
-//   });
-
-// Route to edit an art news post
-//   router.put("/news-art-posts/:postId/edit", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to edit an existing art news post
-//   });
-
-// Route to delete an art news post
-//   router.delete("/news-art-posts/:postId/delete", isLoggedIn, isAdmin, (req, res, next) => {
-// Your code to delete an existing art news post
-//   });
 
 module.exports = router;
