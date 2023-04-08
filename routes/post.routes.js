@@ -53,7 +53,7 @@ router.put("/artposts/:id", (req, res, next) => {
   const {artist, title, description, medium, year, art_image} = req.body;
   console.log(req.body)
 
-  Artpost.findByIdAndUpdate(artpostId, {artist, title, description, medium, year, dimensions, art_image},{ new: true })
+  Artpost.findByIdAndUpdate(artpostId, {artist, title, description, medium, year, art_image},{ new: true })
     .then((updatedArtpost) => {
       console.log(updatedArtpost)
       res.status(200).json(updatedArtpost);
