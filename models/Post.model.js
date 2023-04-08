@@ -14,7 +14,8 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   likedBy: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-  author: {type: mongoose.Schema.Types.ObjectId, ref: "User"}
+  author: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+  postComments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
 }, {
   // this second object adds extra properties: `createdAt` and `updatedAt`
   timestamps: true,

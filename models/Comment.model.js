@@ -5,12 +5,8 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  post: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
-    required: true
-  },
-  author: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
+  commentedPost: {type: mongoose.Schema.Types.ObjectId, ref: 'Post'},
+  author: {type: mongoose.Schema.Types.ObjectId, ref: "User"}
 },
 {
     // this second object adds extra properties: `createdAt` and `updatedAt`
