@@ -8,11 +8,12 @@ const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose");
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
-const {
+/* const {
   isLoggedIn,
   isLoggedOut,
   isAdmin,
-} = require("../middleware/route-guard");
+} = require("../middleware/route-guard"); */
+const Comment = require("../models/Comment.model");
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
@@ -29,7 +30,7 @@ router.post("/artpost", (req, res, next) => {
   const { artist, title, description, medium, year, art_image, author } =
     req.body;
   // Check if all required fields are provided
-  if (!artist || !title || !description || !medium || !year || !art_image) {
+  if (!artist || !title || !medium || !year || !art_image) {
     console.log("Error: Missing required fields");
     res.sendStatus(400).json({ message: "Please provide all required fields" });
     return;
@@ -37,7 +38,7 @@ router.post("/artpost", (req, res, next) => {
   // Create new Artpost object and save to database
   Artpost.create({artist, title, description, medium, year, art_image, author})
     .then((response) => {
-      console.log("Success: Artpost created");
+      
       res.json(response);
       return User.findByIdAndUpdate(author, {$push: { artpostsByUser: response._id }});
     })
@@ -51,11 +52,11 @@ router.post("/artpost", (req, res, next) => {
 router.put("/artposts/:id", (req, res, next) => {
   const artpostId = req.params.id;
   const {artist, title, description, medium, year, art_image} = req.body;
-  console.log(req.body)
+/*   console.log(req.body) */
 
   Artpost.findByIdAndUpdate(artpostId, {artist, title, description, medium, year, dimensions, art_image},{ new: true })
     .then((updatedArtpost) => {
-      console.log(updatedArtpost)
+      /* console.log(updatedArtpost) */
       res.status(200).json(updatedArtpost);
     })
     .catch((error) => {
@@ -103,9 +104,71 @@ router.post("/like/:id/:postType", (req, res, next) => {
     .catch((error) => console.log(error));
 });
 
+router.put("/comment/:id/:postType", (req, res, next) => {
+  const { id, postType } = req.params; // post ID
+  const { author } = req.body; // user
+  const {comment} = req.body
+
+  console.log("req.params ", req.params)
+  console.log("req.body ", req.body)
+  
+
+  Comment.create({comment, author, commentedPost:id})
+    .then((comment) => {
+      User.findByIdAndUpdate(author, {$push: {commentsByUser: comment._id}}, {new: true})
+      .then(() => {
+        if (postType === "art") {
+            return Artpost.findByIdAndUpdate(id, {$push: {postComments: comment._id}}, {new: true})
+        } else  {
+          console.log("📌 Post.update is ", comment)
+            return Post.findByIdAndUpdate(id, {$push: {postComments: comment._id}}, {new: true})
+        }
+    })
+    .catch(error => console.error("error while commenting ", error))
+  })
+ 
+
+
+
+
+  /* User.findById(id)
+    .then((userToUpdate) => {
+      if (userToUpdate.commentsByUser.includes(_id)) {
+        // take out of DB
+        return Comment.findByIdAndDelete(_id)
+          .then(() => User.findByIdAndUpdate(_id, {$pull: {commentsByUser: id}}, {new: true}))
+      } else {
+        // puts info inside of the DB
+        return Comment.create({content, author, commentedPost})
+          .then(() => User.findByIdAndUpdate(_id, {$push: {commentsByUser: id}}, {new: true}))
+      }
+    })
+    .catch(error => console.error("error you get while trying to comment ", error)) */
+
+    /* 
+  store information inside of User.liked
+  create a new instance of Comment with all req.body (content, author, post)
+
+  const { artist, title, description, medium, year, art_image, author } =
+    req.body;
+
+  const {content, author:user._id, post: id <- identifies the type of the post/artpost and pushes its ID to the DB}
+
+  Artpost.create({artist, title, description, medium, year, art_image, author})
+    .then((response) => {
+      console.log("Success: Artpost created");
+      res.json(response);
+      return User.findByIdAndUpdate(author, {$push: { artpostsByUser: response._id }});
+    })
+  
+
+  */
+})
+
 router.get("/artposts/:id", (req, res, next) => {
   console.log("Requested Artpost ID:", req.params.id);
   Artpost.findById(req.params.id)
+  /* .populate("postComments") */
     .then(response => {
       res.json(response);
     })
@@ -188,6 +251,7 @@ router.get("/posts/:id", (req, res, next) => {
   const postId = req.params.id;
   Post.findById(postId)
     .populate("author")
+    .populate("postComments")
     .then((post) => {
       if (!post) { res.status(404).json({ message: `Post with ID ${postId} not found` });
       } else { res.json({ post: post })}
