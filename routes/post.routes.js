@@ -111,7 +111,6 @@ router.put("/comment/:id/:postType", (req, res, next) => {
 
   console.log("req.params ", req.params)
   console.log("req.body ", req.body)
-  
 
   Comment.create({comment, author, commentedPost:id})
     .then((comment) => {
@@ -124,6 +123,9 @@ router.put("/comment/:id/:postType", (req, res, next) => {
             return Post.findByIdAndUpdate(id, {$push: {postComments: comment._id}}, {new: true})
         }
     })
+    .then((response) => {
+      console.log(response)
+      res.json(response)})
     .catch(error => console.error("error while commenting ", error))
   })
  
@@ -168,7 +170,7 @@ router.put("/comment/:id/:postType", (req, res, next) => {
 router.get("/artposts/:id", (req, res, next) => {
   console.log("Requested Artpost ID:", req.params.id);
   Artpost.findById(req.params.id)
-  /* .populate("postComments") */
+    .populate("postComments")
     .then(response => {
       res.json(response);
     })
