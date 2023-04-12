@@ -10,7 +10,7 @@ const commentSchema = new mongoose.Schema({
 },
 {
     // this second object adds extra properties: `createdAt` and `updatedAt`
-    timestamps: true,
+    timestamps: () => dayjs().format("HH:mm:ss")
   }
 );
 

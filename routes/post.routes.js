@@ -171,6 +171,7 @@ router.get("/artposts/:id", (req, res, next) => {
   console.log("Requested Artpost ID:", req.params.id);
   Artpost.findById(req.params.id)
     .populate("postComments")
+    .populate("author")
     .then(response => {
       res.json(response);
     })
