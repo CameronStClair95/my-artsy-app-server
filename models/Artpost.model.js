@@ -21,16 +21,14 @@ const ArtpostSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
-  dimensions: {
-    type: String,
-    required: false,
-  },
+  
   art_image: {
     type: String,
     required: true,
   },
   likedBy: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-  author: {type: mongoose.Schema.Types.ObjectId, ref: "User"}
+  author: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+  postComments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
 },
 {
     // this second object adds extra properties: `createdAt` and `updatedAt`
